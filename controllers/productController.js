@@ -50,26 +50,7 @@ export function createProduct(req,res){
   })
 }
 
-export function deleteProduct(req,res){
 
-  Product.deleteOne({name : req.params.name}).then(
-    ()=>{
-      res.json(
-        {
-          message : "Product deleted successfully"
-        }
-      )
-    }
-  ).catch(
-    ()=>{
-      res.json(
-        {
-          message : "Product not deleted"
-        }
-      )
-    }
-  )
-}
 
 export function getProductByName(req,res){
 
