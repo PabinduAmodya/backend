@@ -3,7 +3,6 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config()
-
 export function createUser(req,res){
 
   const newUserData = req.body
@@ -84,17 +83,31 @@ export function loginUser(req,res){
   )
 }
 
-export function deleteUser(req,res){
-  User.deleteOne({email : req.body.email}).then(
-    ()=>{
-      res.json(
-        {
-          message : "User deleted successfully"
-        }
-      )
-    }
-  )
+export function isAdmin(req){
+  if(req.user==null){
+    return false
+  }
+
+  if(req.user.type != "admin"){
+    return false
+  }
+
+  return true
 }
 
+export function isCustomer(req){
+  if(req.user==null){
+    return false
+  }
+
+  if(req.user.type != "customer"){
+    return false
+  }
+
+  return true
+}
+
+// malith27@example.com securepassword123 - admin
+// malith28@example.com securepassword123 -customer
 
 //pabindu@example.com -28299=>admin
