@@ -31,3 +31,14 @@ export function getProduct(req,res){
     })
     
 }
+
+
+export function deleteProduct(req,res){
+    Product.deleteOne({name : req.params.name}).then(
+        ()=>{
+            res.json({
+                message : "deleted"
+            })
+        }
+    )
+}

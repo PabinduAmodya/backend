@@ -25,6 +25,7 @@ export async function createOrder(req, res) {
     }
 
     const newOrderData = req.body;
+    
     const newProductArray = [];
 
     for (let i = 0; i < newOrderData.orderedItems.length; i++) {
