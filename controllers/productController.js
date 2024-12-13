@@ -32,13 +32,30 @@ export function getProduct(req,res){
     
 }
 
+export function deleteProduct(req, res) {
+    // Check if the user is an admin
+    if (!isAdmin(req)) {
+        return res.json({
+            message: "Please login as administrator to delete products",
+        });
+    }
 
-export function deleteProduct(req,res){
-    Product.deleteOne({name : req.params.name}).then(
-        ()=>{
+    // Proceed with deletion if the user is an admin
+    Product.deleteOne({ name: req.params.name })
+        .then((result) => {
+            if (result.deletedCount > 0) {
+                res.json({
+                    message: "Product deleted successfully",
+                });
+            } else {
+                res.json({
+                    message: "Product not found",
+                });
+            }
+        })
+        .catch((error) => {
             res.json({
-                message : "deleted"
-            })
-        }
-    )
+                message: error.message,
+            });
+        });
 }
