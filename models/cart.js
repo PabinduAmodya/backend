@@ -6,9 +6,9 @@ const cartSchema = mongoose.Schema({
     required: true,
     unique: true
   },
-  userId: {
-    type: String,
-    required: true
+  email : {
+    type : String,
+    required : true
   },
   items: [
     {

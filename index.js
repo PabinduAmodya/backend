@@ -7,10 +7,13 @@ import dotenv from "dotenv";
 import productRouter from './routes/productRouter.js';
 import orderRouter from './routes/orderRouter.js';
 import cartRouter from './routes/cartRouter.js';
+import cors from "cors";
 
 dotenv.config()
 
 const app = express();
+
+app.use(cors())
 
 const mongoUrl = process.env.MONGO_DB_URL
 
