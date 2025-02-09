@@ -17,7 +17,7 @@ export function createPtoduct(req,res){
         })
 
     }).catch((error)=>{
-        req.json({
+        res.status(403).json({
             message : error
         })
     })
