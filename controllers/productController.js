@@ -35,27 +35,26 @@ export function getProduct(req,res){
 export function deleteProduct(req, res) {
     // Check if the user is an admin
     if (!isAdmin(req)) {
-        return res.json({
+         res.status(403).json({
             message: "Please login as administrator to delete products",
-        });
+        })
+        return
     }
 
+    const productId= req.params.productId
+
     // Proceed with deletion if the user is an admin
-    Product.deleteOne({ name: req.params.name })
-        .then((result) => {
-            if (result.deletedCount > 0) {
+    Product.deleteOne({ productId : productId})
+        .then(() => {
+            
                 res.json({
                     message: "Product deleted successfully",
-                });
-            } else {
-                res.json({
-                    message: "Product not found",
-                });
-            }
+                })
+         
         })
         .catch((error) => {
-            res.json({
-                message: error.message,
-            });
-        });
+            res.status(403).json({
+                message: error
+            })
+        })
 }
