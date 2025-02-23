@@ -1,6 +1,6 @@
 import Order from "../models/order.js";
 import Product from "../models/product.js";
-import { isCustomer } from "./userController.js";
+import { isAdmin, isCustomer } from "./userController.js";
 
 export async function createOrder(req, res) {
   if (!isCustomer) {
@@ -40,20 +40,20 @@ export async function createOrder(req, res) {
       }
 
       // Check if enough stock is available
-      if (product.stock < newOrderData.orderedItems[i].quantity) {
+      if (product.stock < newOrderData.orderedItems[i].qty) {
         return res.json({
           message: `Insufficient stock for product with id ${newOrderData.orderedItems[i].productId}`,
         });
       }
 
       // Deduct the stock
-      product.stock -= newOrderData.orderedItems[i].quantity;
+      product.stock -= newOrderData.orderedItems[i].qty;
       await product.save();
 
       newProductArray[i] = {
         name: product.productName,
         price: product.price,
-        quantity: newOrderData.orderedItems[i].quantity,
+        quantity: newOrderData.orderedItems[i].qty,
         image: product.images[0],
       };
     }
@@ -63,10 +63,11 @@ export async function createOrder(req, res) {
     newOrderData.email = req.user.email;
 
     const order = new Order(newOrderData);
-    await order.save();
+    const savedOrder=await  order.save();
 
     res.json({
       message: "Order created",
+      order : savedOrder
     });
   } catch (error) {
     res.status(500).json({
@@ -76,9 +77,73 @@ export async function createOrder(req, res) {
 }
 
 export async function getOrders(req, res) {
+
+ 
   try {
-    const orders = await Order.find({ email: req.user.email });
-    res.json(orders);
+    if(isCustomer){
+      const orders = await Order.find({ email: req.user.email });
+      res.json(orders);
+      return
+    }else if(isAdmin(req)){
+      const orders = await Order.find({});
+      res.json(orders);
+      return;
+    }else{
+      res.json({
+        message:"Please login to view orders"
+      })
+    }
+    
+  } catch (error) {
+    res.status(500).json({
+      message: error.message,
+    });
+  }
+}
+export async function getQuote(req, res) {
+  try {
+    let total = 0;
+    let labelTotal = 0;
+
+    const newOrderData = req.body;
+    const newProductArray = [];
+
+    for (let i = 0; i < newOrderData.orderedItems.length; i++) {
+      const product = await Product.findOne({
+        productId: newOrderData.orderedItems[i].productId,
+      });
+
+      if (!product) {
+        return res.status(404).json({
+          message: `Product with id ${newOrderData.orderedItems[i].productId} not found`,
+        });
+      }
+
+      // Check if enough stock is available
+      if (product.stock < newOrderData.orderedItems[i].qty) {
+        return res.status(400).json({
+          message: `Insufficient stock for product with id ${newOrderData.orderedItems[i].productId}`,
+        });
+      }
+
+      labelTotal += product.price * newOrderData.orderedItems[i].qty;
+      total += product.lastPrice * newOrderData.orderedItems[i].qty;
+
+      newProductArray.push({
+        name: product.productName,
+        price: product.lastPrice,
+        labeledPrice: product.price,
+        quantity: newOrderData.orderedItems[i].qty,
+        image: product.images[0],
+      });
+    }
+
+    res.json({
+      orderedItems: newProductArray,
+      total: total,
+      labelTotal: labelTotal,
+    });
+
   } catch (error) {
     res.status(500).json({
       message: error.message,
