@@ -116,6 +116,8 @@ export function isCustomer(req){
 
 
 
+
+
 //pabindu@example.com -28299=>admin
 //"email": "john1234.doe@example133.com","password":"123"=>customer
   
