@@ -114,6 +114,18 @@ export function isCustomer(req){
   return true
 }
 
+export async function getUser(req,res){
+  if(req.user==null){
+    res.status(404).json({
+      message:"Please login to view user details"
+    })
+    return
+  }
+
+  res.json(req.user)
+
+}
+
 
 
 
